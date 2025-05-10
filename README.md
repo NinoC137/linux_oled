@@ -18,12 +18,12 @@ make all
 或手动进行编译
 
 ```bash
-gcc oled_display.c get_system_info.c ssd1306_i2c.c -lwiringPi -o oled_display
+gcc oled_display.c get_system_info.c ssd1306_i2c.c -li2c -o oled_display
 ```
 
 ### 项目依赖
 
-1. wiringPi库
+1. libi2c-dev
 
 ### 参考链接
 
