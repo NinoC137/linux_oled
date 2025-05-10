@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <signal.h>
+#include <unistd.h>
 
 #include "ssd1306_i2c.h"
 #include "oled_fonts.h"
@@ -28,7 +29,7 @@ int main(){
         // ssd1306_drawString(status_buffer);
         ssd1306_drawBuffer(status_buffer, sizeof(status_buffer));
         ssd1306_display();
-        delay(1000);
+        usleep(1000 * 1000);
     }
 
     return 0;

@@ -27,9 +27,16 @@ All text above, and the splash screen below must be included in any redistributi
 #include <stdio.h>
 #include <string.h>
 
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+
+#include <linux/i2c-dev.h>
+#include <i2c/smbus.h>
+
 #include "ssd1306_i2c.h"
 
-#include <wiringPiI2C.h>
+// #include <wiringPiI2C.h>
 
 #include "oled_fonts.h"
 
@@ -227,7 +234,10 @@ void ssd1306_begin(unsigned int vccstate, unsigned int i2caddr)
 
 	_vccstate = vccstate;
 
-	i2cd = wiringPiI2CSetup(i2caddr);
+	// i2cd = wiringPiI2CSetup(i2caddr);
+	i2cd = open(I2C_BUS, O_RDWR);
+	ioctl(i2cd, I2C_SLAVE, i2caddr);
+
 	if (i2cd < 0) {
 		fprintf(stderr, "ssd1306_i2c : Unable to initialise I2C:\n");
 		return;
@@ -306,11 +316,13 @@ void ssd1306_invertDisplay(unsigned int i)
 	}
 }
 
+
 void ssd1306_command(unsigned int c)
 {
 	// I2C
 	unsigned int control = 0x00;	// Co = 0, D/C = 0
-	wiringPiI2CWriteReg8(i2cd, control, c);
+	// wiringPiI2CWriteReg8(i2cd, control, c);	
+	i2c_smbus_write_byte_data(i2cd, control, c);	
 }
 
 void ssd1306_display(void)
@@ -335,7 +347,8 @@ void ssd1306_display(void)
 	// I2C
 	int i;
 	for (i = 0; i < (SSD1306_LCDWIDTH * SSD1306_LCDHEIGHT / 8); i++) {
-		wiringPiI2CWriteReg8(i2cd, 0x40, buffer[i]); 
+		// wiringPiI2CWriteReg8(i2cd, 0x40, buffer[i]); 
+		i2c_smbus_write_byte_data(i2cd, 0x40, buffer[i]);
 		//This sends byte by byte. 
 		//Better to send all buffer without 0x40 first
 		//Should be optimized
